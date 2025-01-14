@@ -202,3 +202,47 @@ app.post('/contactus', async (req, res) => {
     });
   });
   
+
+
+  
+
+  app.post('/enquiry', async (req, res) => {
+    const formData = req.body;
+  
+    // Create a transporter
+    let transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER, // Your email
+        pass: process.env.EMAIL_PASS, // Your email password or app password
+      },
+    });
+  
+    // Email content
+    let mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: 'harshalpatilhp700@gmail.com', // Replace with your email
+      subject: 'Admission Enquiry Form Submission',
+      html: `
+        <h2>New Admission Enquiry</h2>
+        <p><strong>First Name:</strong> ${formData.firstName}</p>
+        <p><strong>Last Name:</strong> ${formData.lastName}</p>
+        <p><strong>Email:</strong> ${formData.email}</p>
+        <p><strong>Mobile Number:</strong> ${formData.mobileNumber}</p>
+        <p><strong>Class Selected:</strong> ${formData.selectedClass}</p>
+        <p><strong>Message:</strong> ${formData.message}</p>
+      `,
+    };
+  
+    // Send email
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log('Error sending email:', error);
+        res.status(500).send({ success: false, error: error.message });
+      } else {
+        console.log('Email sent:', info.response);
+        res.send({ success: true });
+      }
+    });
+  });
+  
